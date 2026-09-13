@@ -13,8 +13,9 @@ typedef RequestHandler = Function(HyperRequest req, HyperResponse res);
 class RouteMatch {
   final RequestHandler handler;
   final Map<String, String> params;
+  final List<Middleware> middlewares;
 
-  RouteMatch(this.handler, this.params);
+  RouteMatch(this.handler, this.params, this.middlewares);
 }
 
 class RouteNode {
@@ -22,6 +23,7 @@ class RouteNode {
   final bool isParam;
   RequestHandler? handler;
   final Map<String, RouteNode> children = {};
+  List<Middleware> middlewares = [];
 
   RouteNode? paramChild;
 
@@ -43,7 +45,11 @@ class RadixRouter {
     return path.split('/').where((s) => s.isNotEmpty).toList();
   }
 
-  void insert(String path, RequestHandler handler) {
+  void insert(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
     final segments = _splitPath(path);
     RouteNode current = _root;
 
@@ -60,6 +66,7 @@ class RadixRouter {
     }
 
     current.handler = handler;
+    current.middlewares = middleware;
   }
 
   RouteMatch? search(String path) {
@@ -81,29 +88,49 @@ class RadixRouter {
     }
 
     if (current.handler != null) {
-      return RouteMatch(current.handler!, extractedParams);
+      return RouteMatch(current.handler!, extractedParams, current.middlewares);
     }
 
     return null;
   }
 
-  void get(String path, RequestHandler handler) {
-    insert('GET|$path', handler);
+  void get(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
+    insert('GET|$path', handler, middleware);
   }
 
-  void post(String path, RequestHandler handler) {
-    insert('POST|$path', handler);
+  void post(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
+    insert('POST|$path', handler, middleware);
   }
 
-  void put(String path, RequestHandler handler) {
-    insert('PUT|$path', handler);
+  void put(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
+    insert('PUT|$path', handler, middleware);
   }
 
-  void patch(String path, RequestHandler handler) {
-    insert('PATCH|$path', handler);
+  void patch(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
+    insert('PUT|$path', handler, middleware);
   }
 
-  void delete(String path, RequestHandler handler) {
-    insert('DELETE|$path', handler);
+  void delete(
+    String path,
+    RequestHandler handler, [
+    List<Middleware> middleware = const [],
+  ]) {
+    insert('DELETE|$path', handler, middleware);
   }
 }

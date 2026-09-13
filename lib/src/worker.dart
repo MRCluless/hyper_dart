@@ -39,11 +39,12 @@ void startWorker(WorkerConfig config) async {
       if (match != null) {
         final req = HyperRequest(request, match.params);
         final res = HyperResponse(request.response);
+        final pipeline = [...router.middlewares, ...match.middlewares];
         int index = 0;
 
         Future<void> next() async {
-          if (index < router.middlewares.length) {
-            final currentMiddleware = router.middlewares[index];
+          if (index < pipeline.length) {
+            final currentMiddleware = pipeline[index];
             index++;
             await currentMiddleware(req, res, next);
           } else {
