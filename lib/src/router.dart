@@ -1,9 +1,14 @@
-import 'dart:io';
+import 'package:hyper_dart/src/context.dart';
 
-typedef RequestHandler = void Function(
-  HttpRequest request,
-  Map<String, String> params,
+typedef NextFunction = Future<void> Function();
+
+typedef Middleware = Future<void> Function(
+  HyperRequest req,
+  HyperResponse res,
+  NextFunction next,
 );
+
+typedef RequestHandler = Function(HyperRequest req, HyperResponse res);
 
 class RouteMatch {
   final RequestHandler handler;
@@ -25,6 +30,14 @@ class RouteNode {
 
 class RadixRouter {
   final RouteNode _root = RouteNode("");
+
+  final List<Middleware> _middlewares = [];
+
+  void use(Middleware middleware) {
+    _middlewares.add(middleware);
+  }
+
+  List<Middleware> get middlewares => _middlewares;
 
   List<String> _splitPath(String path) {
     return path.split('/').where((s) => s.isNotEmpty).toList();
@@ -80,5 +93,17 @@ class RadixRouter {
 
   void post(String path, RequestHandler handler) {
     insert('POST|$path', handler);
+  }
+
+  void put(String path, RequestHandler handler) {
+    insert('PUT|$path', handler);
+  }
+
+  void patch(String path, RequestHandler handler) {
+    insert('PATCH|$path', handler);
+  }
+
+  void delete(String path, RequestHandler handler) {
+    insert('DELETE|$path', handler);
   }
 }

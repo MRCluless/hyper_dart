@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:hyper_dart/hyper_dart.dart';
-import 'package:hyper_dart/src/router.dart';
 
 void setupRoutes(RadixRouter app) {
-  app.get('/ping', (req, params) {
-    req.response
-      ..statusCode = HttpStatus.ok
-      ..write('Pong')
-      ..close();
+  app.get('/users/:id', (req, res) {
+    String userId = req.params['id']!;
+
+    res.json({'status': 'success', 'userId': userId});
   });
 }
 

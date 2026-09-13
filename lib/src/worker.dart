@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:hyper_dart/src/context.dart';
+
 import 'router.dart';
 
 class WorkerConfig {
@@ -30,12 +32,26 @@ void startWorker(WorkerConfig config) async {
       'Isolate [${Isolate.current.debugName}] listening on port ${server.port}',
     );
 
-    server.listen((HttpRequest request) {
+    server.listen((HttpRequest request) async {
       final path = request.uri.path;
       final match = router.search('${request.method}|$path');
 
       if (match != null) {
-        match.handler(request, match.params);
+        final req = HyperRequest(request, match.params);
+        final res = HyperResponse(request.response);
+        int index = 0;
+
+        Future<void> next() async {
+          if (index < router.middlewares.length) {
+            final currentMiddleware = router.middlewares[index];
+            index++;
+            await currentMiddleware(req, res, next);
+          } else {
+            match.handler(req, res);
+          }
+        }
+
+        await next();
       } else {
         request.response
           ..statusCode = HttpStatus.notFound
