@@ -1,7 +1,8 @@
 name: hyper_dart
-description: A sample command-line application.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+description: A high-performance, multi-core Dart web framework featuring an Express.js-style API, deterministic graceful shutdowns, and O(K) Radix Tree routing.
+homepage: https://github.com/MRCluless/hyper_dart
+repository: https://github.com/MRCluless/hyper_dart
 
 environment:
   sdk: ^3.13.3

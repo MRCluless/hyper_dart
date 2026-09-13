@@ -1,6 +1,3 @@
-A high-performance, multi-core Dart web framework featuring an Express.js-style API, deterministic graceful shutdowns, and O(K) Radix Tree routing.
-
-```
 import 'package:hyper_dart/hyper_dart.dart';
 
 // Mock authentication middleware
